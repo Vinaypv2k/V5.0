@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fishing Engineer's Calculator V5.0</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">FE</div><div><h1>Fishing Engineer's Calculator <span>V5.0</span></h1><small>Modular Tubular Engineering Workbench</small></div></div>
+  <div class="actions">
+    <label>UNIT SYSTEM
+      <select id="system"><option value="oil">FPS / Oilfield</option><option value="si">Metric / SI</option></select>
+    </label>
+    <button onclick="window.print()">Print / PDF</button>
+  </div>
+</header>
+<div class="layout">
+<aside>
+  <button class="nav active" data-p="dash">Dashboard</button>
+  <button class="nav" data-p="string">String / BHA</button>
+  <button class="nav" data-p="strength">Tubular Strength</button>
+  <button class="nav" data-p="fishing">Fishing Loads</button>
+  <button class="nav" data-p="report">Report</button>
+  <div class="side">V5.0<br><small>GitHub Pages Ready</small></div>
+</aside>
+<main>
+<section id="dash" class="page active">
+  <div class="hero"><div><small>TUBULAR ENGINEERING</small><h2>V5.0 Dashboard</h2><p>Select a tubular once and propagate its data into the string and load modules.</p></div></div>
+  <div class="kpis">
+    <div><small>SELECTED TUBULAR</small><b id="kTub">—</b></div>
+    <div><small>GRADE</small><b id="kGrade">—</b></div>
+    <div><small>OD</small><b id="kOD">—</b></div>
+    <div><small>ID</small><b id="kID">—</b></div>
+    <div><small>LINEAR WT</small><b id="kWt">—</b></div>
+    <div><small>BODY AREA</small><b id="kArea">—</b></div>
+  </div>
+  <div class="note"><b>Database status:</b> V5.0 uses a curated engineering starter library with source/version fields. Values used for field decisions must be checked against the actual pipe tally, manufacturer datasheet and applicable API edition.</div>
+</section>
+
+<section id="string" class="page">
+  <h2>String / BHA — Tubular Library</h2>
+  <div class="card">
+    <h3>Search & Select</h3>
+    <div class="fields">
+      <label>Category<select id="category"></select></label>
+      <label>Size<select id="size"></select></label>
+      <label>Weight<select id="weight"></select></label>
+      <label>Grade<select id="grade"></select></label>
+      <label>Connection<select id="connection"></select></label>
+    </div>
+    <div id="selected" class="result"></div>
+  </div>
+
+  <div class="card">
+    <h3>Auto-loaded Engineering Data</h3>
+    <div class="data-grid">
+      <div><small>OD</small><b id="dOD">—</b></div>
+      <div><small>ID</small><b id="dID">—</b></div>
+      <div><small>Wall</small><b id="dWall">—</b></div>
+      <div><small>Drift ID</small><b id="dDrift">—</b></div>
+      <div><small>Nominal Weight</small><b id="dWt">—</b></div>
+      <div><small>SMYS</small><b id="dSMYS">—</b></div>
+      <div><small>Tensile Strength</small><b id="dUTS">—</b></div>
+      <div><small>Body Area</small><b id="dArea">—</b></div>
+      <div><small>Body Yield</small><b id="dYield">—</b></div>
+      <div><small>Tool Joint OD</small><b id="dTJOD">—</b></div>
+      <div><small>Tool Joint ID</small><b id="dTJID">—</b></div>
+      <div><small>Source</small><b id="dSource">—</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Add to String / BHA Tally</h3>
+    <div class="fields">
+      <label>Component name<input id="componentName"></label>
+      <label>Length <span id="uLen"></span><input id="componentLength"></label>
+      <label>Quantity<input id="quantity" value="1"></label>
+    </div>
+    <button onclick="addSelectedTubular()">Add Selected Tubular</button>
+  </div>
+
+  <div class="card tablewrap">
+    <table><thead><tr><th>Component</th><th>Grade</th><th>Connection</th><th>OD</th><th>ID</th><th>Wt</th><th>Length</th><th>Air Weight</th><th>Internal Vol</th><th></th></tr></thead><tbody id="tallyBody"></tbody></table>
+    <div id="tallyResult" class="result">No components added.</div>
+  </div>
+</section>
+
+<section id="strength" class="page">
+  <h2>Tubular Strength</h2>
+  <div class="card">
+    <div class="note">This module automatically uses the selected tubular's OD, ID and grade strength. Connection performance is intentionally not invented; use verified OEM/API connection ratings where required.</div>
+    <div class="fields">
+      <label>Design factor<input id="designFactor" value="0.80"></label>
+      <label>Applied axial load <span id="uForce"></span><input id="appliedLoad"></label>
+      <label>Connection efficiency %<input id="connectionEfficiency" value="100"></label>
+    </div>
+    <button onclick="calculateSelectedStrength()">Calculate</button>
+    <div id="strengthResult" class="result"></div>
+  </div>
+</section>
+
+<section id="fishing" class="page">
+  <h2>Fishing Loads</h2>
+  <div class="card">
+    <div class="fields">
+      <label>Current hookload <span id="uHook"></span><input id="hookload"></label>
+      <label>Planned overpull <span id="uOver"></span><input id="plannedOverpull"></label>
+      <label>Allowable pull <span id="uAllow"></span><input id="allowablePull" placeholder="Auto from strength module"></label>
+    </div>
+    <button onclick="calculateFishingLoad()">Calculate</button>
+    <div id="fishingResult" class="result"></div>
+  </div>
+</section>
+
+<section id="report" class="page">
+  <div class="hero"><div><small>ENGINEERING RECORD</small><h2>Calculation Report</h2></div><button onclick="window.print()">Print / Save PDF</button></div>
+  <div id="reportOut" class="card">No calculations recorded.</div>
+</section>
+</main>
+</div>
+<footer>Fishing Engineer's Calculator V5.0 • Verify database values and ratings before operational use</footer>
+<script type="module" src="js/app.js"></script>
+</body></html>
